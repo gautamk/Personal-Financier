@@ -1,0 +1,9 @@
+db/
+eclipse
+logs/
+test-result/
+tmp/
+.settings/
+.classpath
+.project
+Application-skel.iml
