@@ -1,6 +1,7 @@
 package models;
 
 import play.*;
+import play.data.validation.Required;
 import play.db.jpa.*;
 
 import javax.persistence.*;
@@ -9,23 +10,49 @@ import java.util.*;
 @Entity
 public class FinancialTransaction extends Model {
 	public static enum TYPE {
-		INCOME,
-		EXPENSE
+		INCOME,EXPENSE;
+		@Override 
+		public String toString() {
+			   //only capitalize the first letter
+			   String s = super.toString();
+			   return s.substring(0, 1) + s.substring(1).toLowerCase();
+		 }
+
 	};
-	public Date date;
+	@Temporal(TemporalType.DATE)
+	public Calendar date;
+	@Required
 	public String reason;
+	@Required
 	public TYPE type;
+	@Required
 	public double value;
-	
-	public FinancialTransaction(Date date, String reason, TYPE type,
+	/**
+	 * @param date
+	 * @param reason
+	 * @param type
+	 * @param value
+	 */
+	public FinancialTransaction(Calendar date, String reason, TYPE type,
 			double value) {
 		super();
 		this.date = date;
 		this.reason = reason;
 		this.type = type;
 		this.value = value;
-	}	
+	}
 	
+	
+	
+	public static List<FinancialTransaction> getByDate(final Calendar date) {
+		JPAQuery jpaq = FinancialTransaction.find("date=?", date);
+		List<FinancialTransaction>lst = jpaq.fetch();
+		return lst;
+	}
+	
+	
+	
+	@Override
 	public boolean equals(Object o) {
 		FinancialTransaction ft =  (FinancialTransaction) o;
 		if(!ft.date.equals(this.date)) 
@@ -36,10 +63,12 @@ public class FinancialTransaction extends Model {
 			return false;
 		if(ft.value != this.value)
 			return false;
-
 		return true;
 	}
 	
+	public String toString() {
+		return this.type+" by "+this.reason+" on " +this.date.getTime()+" of "+this.value;
+	}
 	
     
 }
